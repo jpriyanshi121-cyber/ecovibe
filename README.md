@@ -1,4 +1,4 @@
-# 🌿 EcoVibe — Sustainable Marketplace
+# 🌿 EcoVibe — Rethink Waste. Live Sustainable.
 
 EcoVibe is a full-stack sustainable e-commerce platform where users can buy, sell, and discover pre-loved eco-friendly items — reducing waste and promoting circular economy.
 
