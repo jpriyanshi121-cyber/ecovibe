@@ -39,4 +39,4 @@ This starts both frontend and backend together!
 Millions of usable products end up in landfills every year. EcoVibe creates a community-driven marketplace that gives products a second life, reducing environmental waste while saving money for buyers and sellers.
 
 ## 👥 Built For
-WitchHunt Hackathon — HopeWorks Foundation, Bangalore 2025
+WitchHunt Hackathon — HopeWorks Foundation, Bangalore
