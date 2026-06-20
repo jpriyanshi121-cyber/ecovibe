@@ -1,13 +1,13 @@
 {
-  "version": 2,
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/dist",
-  "env": {
-    "VITE_API_URL": "@vite_api_url"
-  },
-  "functions": {
-    "backend/src/index.js": {
-      "runtime": "nodejs20.x"
+    "experimentalServices": {
+        "frontend": {
+            "root": "frontend",
+            "routePrefix": "/",
+            "framework": "vite"
+        },
+        "backend": {
+            "root": "backend",
+            "routePrefix": "/_/backend"
+        }
     }
-  }
 }
