@@ -15,43 +15,56 @@ const { errorHandler, notFound } = require("./middleware/error.middleware");
 
 const app = express();
 
-// ─── CORS ────────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
+// ─── CORS ───────────────────────────────────────────────────────────
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "http://localhost:5173").split(",").filter(Boolean);
+
+// Validate CORS origins
+if (allowedOrigins.length === 0) {
+  console.warn("⚠️  WARNING: No valid CORS origins configured. Using default localhost.");
+  allowedOrigins.push("http://localhost:5173");
+}
+
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
       cb(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
   })
 );
 
-// ─── Rate Limiting ────────────────────────────────────────────────────────────
+// ─── Rate Limiting ────────────────────────────────────────────────────────
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200,
   message: { success: false, message: "Too many requests, please try again later." },
+  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   message: { success: false, message: "Too many auth attempts, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(limiter);
 
-// ─── Body Parsing ─────────────────────────────────────────────────────────────
+// ─── Body Parsing ────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// ─── Logging ──────────────────────────────────────────────────────────────────
+// ─── Logging ──────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
-// ─── Static Files ─────────────────────────────────────────────────────────────
+// ─── Static Files ────────────────────────────────────────────────────────
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+// ─── Health Check ────────────────────────────────────────────────────────
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -61,7 +74,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Routes ──────────────────────────────────────────────────────────
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
@@ -69,7 +82,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/challenges", challengeRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// ─── Error Handling ───────────────────────────────────────────────────────────
+// ─── Error Handling ────────────────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 

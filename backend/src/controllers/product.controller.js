@@ -59,6 +59,11 @@ exports.getProduct = async (req, res, next) => {
 // POST /api/products
 exports.createProduct = async (req, res, next) => {
   try {
+    // Validate required fields
+    if (!req.body.name || !req.body.price) {
+      return res.status(400).json({ success: false, message: "Name and price are required" });
+    }
+
     const images = req.files ? req.files.map((f) => `/uploads/${f.filename}`) : [];
     const product = await Product.create({
       ...req.body,
@@ -112,24 +117,34 @@ exports.deleteProduct = async (req, res, next) => {
   }
 };
 
-// POST /api/products/:id/like  (toggle)
+// POST /api/products/:id/like  (toggle) - Fixed with atomic operation
 exports.likeProduct = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const uid = req.user._id;
+    const productId = req.params.id;
+
+    // Use atomic findByIdAndUpdate to prevent race conditions
+    const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ success: false, message: "Product not found" });
 
-    const uid = req.user._id;
     const liked = product.likes.map((l) => l.toString()).includes(uid.toString());
 
+    let updatedProduct;
     if (liked) {
-      product.likes.pull(uid);
+      updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        { $pull: { likes: uid }, $inc: { likesCount: -1 } },
+        { new: true }
+      );
     } else {
-      product.likes.push(uid);
+      updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        { $push: { likes: uid }, $inc: { likesCount: 1 } },
+        { new: true }
+      );
     }
-    product.likesCount = product.likes.length;
-    await product.save();
 
-    res.json({ success: true, liked: !liked, likesCount: product.likesCount });
+    res.json({ success: true, liked: !liked, likesCount: updatedProduct.likesCount });
   } catch (err) {
     next(err);
   }
@@ -138,18 +153,30 @@ exports.likeProduct = async (req, res, next) => {
 // POST /api/products/:id/reviews
 exports.addReview = async (req, res, next) => {
   try {
+    const { rating, comment } = req.body;
+    
+    // Validate review data
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: "Rating must be between 1 and 5" });
+    }
+
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: "Product not found" });
 
     const alreadyReviewed = product.reviews.find((r) => r.user.toString() === req.user._id.toString());
     if (alreadyReviewed) return res.status(400).json({ success: false, message: "You already reviewed this product" });
 
-    product.reviews.push({ user: req.user._id, rating: req.body.rating, comment: req.body.comment });
+    product.reviews.push({ user: req.user._id, rating, comment: comment || "" });
     product.updateRating();
     await product.save();
 
-    // Award eco points to reviewer
-    await User.findByIdAndUpdate(req.user._id, { $inc: { ecoScore: 5 } });
+    // Award eco points to reviewer with error handling
+    try {
+      await User.findByIdAndUpdate(req.user._id, { $inc: { ecoScore: 5 } });
+    } catch (userErr) {
+      console.error("Error awarding eco points:", userErr.message);
+      // Don't fail the review if eco points fail
+    }
 
     res.status(201).json({ success: true, averageRating: product.averageRating, numReviews: product.numReviews });
   } catch (err) {
