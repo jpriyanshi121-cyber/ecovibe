@@ -22,16 +22,22 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: [
-        "food-beverage",
+        "furniture",
         "clothing",
-        "home-living",
-        "beauty-personal-care",
         "electronics",
-        "outdoors",
-        "education",
+        "decor",
+        "books",
+        "materials",
         "other",
       ],
     },
+
+    condition: {
+      type: String,
+      enum: ["New", "Like New", "Good", "Fair"],
+      default: "Good",
+    },
+    location: { type: String, trim: true, default: "" },
 
     // Eco attributes
     ecoTags: [{ type: String }], // e.g. ["organic", "zero-waste", "recycled"]

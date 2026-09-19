@@ -1,5 +1,6 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiFetch } from "../lib/api";
 import { Header } from "./components/Header";
 import { CategoryFilter } from "./components/CategoryFilter";
 import { ProductCard, Product } from "./components/ProductCard";
@@ -21,96 +22,6 @@ import { EcoReels } from "./components/EcoReels";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
 
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    title: "Vintage Oak Dining Table",
-    price: 245,
-    category: "furniture",
-    condition: "Good",
-    location: "Portland, OR",
-    image: "https://images.unsplash.com/photo-1668955254766-1bb2de25cf16?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xlZCUyMGZ1cm5pdHVyZXxlbnwxfHx8fDE3NjI4ODI4MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Sarah Miller",
-    description: "Beautiful reclaimed oak dining table. Seats 6 comfortably. Minor scratches add character. Perfect for sustainable living!"
-  },
-  {
-    id: "2",
-    title: "Vintage Denim Jacket Collection",
-    price: 45,
-    category: "clothing",
-    condition: "Like New",
-    location: "Austin, TX",
-    image: "https://images.unsplash.com/photo-1614990354198-b06764dcb13c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYyODgyODA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Mike Chen",
-    description: "Classic denim jacket from the 90s. Excellent condition, just doesn't fit anymore. Sustainable fashion at its best!"
-  },
-  {
-    id: "3",
-    title: "Refurbished Laptop - Dell",
-    price: 320,
-    category: "electronics",
-    condition: "Good",
-    location: "Seattle, WA",
-    image: "https://images.unsplash.com/photo-1695712551666-e0c354b1e6b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xlZCUyMGVsZWN0cm9uaWNzfGVufDF8fHx8MTc2Mjg4MjgwNXww&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Tech Renewals",
-    description: "Dell laptop professionally refurbished. 8GB RAM, 256GB SSD. Perfect for students or remote work. Saving e-waste!"
-  },
-  {
-    id: "4",
-    title: "Handmade Upcycled Wall Art",
-    price: 85,
-    category: "decor",
-    condition: "Like New",
-    location: "Denver, CO",
-    image: "https://images.unsplash.com/photo-1694537709541-672813820324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cGN5Y2xlZCUyMGRlY29yfGVufDF8fHx8MTc2Mjg4MjgwNXww&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Artisan Collective",
-    description: "Unique wall art created from reclaimed wood and metal. Each piece tells a story. Makes a statement in any room!"
-  },
-  {
-    id: "5",
-    title: "Classic Literature Collection",
-    price: 35,
-    category: "books",
-    condition: "Good",
-    location: "Boston, MA",
-    image: "https://images.unsplash.com/photo-1737205788369-77514fcab7b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzZWNvbmQlMjBoYW5kJTIwYm9va3N8ZW58MXx8fHwxNzYyODgyODA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Book Lover",
-    description: "Set of 12 classic novels. Well-loved but in great reading condition. Give these stories a new home!"
-  },
-  {
-    id: "6",
-    title: "Recycled Craft Materials Bundle",
-    price: 20,
-    category: "materials",
-    condition: "Good",
-    location: "San Francisco, CA",
-    image: "https://images.unsplash.com/photo-1691430596599-d8268793294b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xlZCUyMG1hdGVyaWFsc3xlbnwxfHx8fDE3NjI4ODI4MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Eco Crafts",
-    description: "Assorted recycled materials perfect for DIY projects. Includes fabric scraps, buttons, wood pieces, and more!"
-  },
-  {
-    id: "7",
-    title: "Mid-Century Modern Chair",
-    price: 175,
-    category: "furniture",
-    condition: "Like New",
-    location: "Brooklyn, NY",
-    image: "https://images.unsplash.com/photo-1649003366476-2d968f76d37a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwZnVybml0dXJlJTIwd29vZHxlbnwxfHx8fDE3NjI4ODMwNDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Vintage Finds",
-    description: "Beautifully restored mid-century modern chair. Reupholstered with sustainable fabric. A timeless piece for any home."
-  },
-  {
-    id: "8",
-    title: "Organic Cotton Tote Bag",
-    price: 15,
-    category: "clothing",
-    condition: "Like New",
-    location: "Los Angeles, CA",
-    image: "https://images.unsplash.com/photo-1677753727712-c79ce4c420c1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdXN0YWluYWJsZSUyMHNob3BwaW5nJTIwYmFnfGVufDF8fHx8MTc2Mjg4MzA0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
-    seller: "Eco Shop",
-    description: "Handcrafted organic cotton tote bag. Perfect for groceries or daily use. Say goodbye to single-use plastics!"
-  }
-];
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState(() => {
@@ -124,6 +35,36 @@ export default function App() {
   const [showAIChat, setShowAIChat] = useState(false);
   const [cartCount, setCartCount] = useState(2);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(false);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setProductsLoading(true);
+      setProductsError(false);
+      try {
+        const data = await apiFetch("/products");
+        const mapped: Product[] = (data.products || []).map((p: any) => ({
+          id: p._id,
+          title: p.name,
+          price: p.price,
+          category: p.category,
+          condition: p.condition || "Good",
+          location: p.location || "",
+          image: (p.images && p.images[0]) || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800",
+          seller: p.seller?.name || "EcoVibe Seller",
+          description: p.description,
+        }));
+        setProducts(mapped);
+      } catch (err) {
+        setProductsError(true);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -139,7 +80,7 @@ export default function App() {
     });
   };
 
-  const filteredProducts = mockProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -204,7 +145,26 @@ export default function App() {
                 </div>
               </div>
 
-              {filteredProducts.length === 0 ? (
+              {productsLoading ? (
+                <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                      <span className="text-3xl">🌿</span>
+                    </div>
+                    <h3 className="text-gray-900 mb-2">Loading products...</h3>
+                  </div>
+                </div>
+              ) : productsError ? (
+                <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-3xl">⚠️</span>
+                    </div>
+                    <h3 className="text-gray-900 mb-2">Couldn't load products</h3>
+                    <p className="text-gray-500 text-sm">Check that the backend server is running and try refreshing.</p>
+                  </div>
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
                   <div className="max-w-md mx-auto">
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
