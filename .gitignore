@@ -1,5 +1,4 @@
-﻿@"
-node_modules/
+﻿node_modules/
 frontend/node_modules/
 backend/node_modules/
 frontend/dist/
@@ -14,4 +13,3 @@ Thumbs.db
 .vscode/
 .idea/
 coverage/
-"@ | Set-Content -Path .gitignore -Encoding utf8
