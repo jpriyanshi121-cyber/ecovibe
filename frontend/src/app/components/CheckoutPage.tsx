@@ -115,7 +115,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/30 to-white py-8">
+    <div className="min-h-screen bg-linear-to-b from-emerald-50/30 to-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -144,7 +144,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               {/* Shipping Information */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-linear-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
                     <MapPin className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -239,7 +239,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               {/* Shipping Method */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
                     <Truck className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -287,7 +287,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               {/* Payment Method */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
                     <CreditCard className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -435,7 +435,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 </div>
 
                 {/* Sustainability Impact */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
+                <div className="mt-6 p-4 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
                   <div className="flex items-start gap-2 mb-2">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <div>
@@ -450,7 +450,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 {/* Place Order Button */}
                 <Button
                   type="submit"
-                  className="w-full mt-6 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200"
+                  className="w-full mt-6 h-12 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200"
                 >
                   <Lock className="h-4 w-4 mr-2" />
                   Place Order

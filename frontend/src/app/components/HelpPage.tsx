@@ -148,7 +148,7 @@ export function HelpPage() {
             <Card key={idx} className="rounded-2xl border-gray-200">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-linear-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center">
                     <category.icon className="h-5 w-5 text-emerald-600" />
                   </div>
                   {category.category}
@@ -204,7 +204,7 @@ export function HelpPage() {
               className="rounded-xl border-gray-300 min-h-32 resize-none" 
             />
           </div>
-          <Button className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl">
+          <Button className="w-full h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl">
             Send Message
           </Button>
         </CardContent>

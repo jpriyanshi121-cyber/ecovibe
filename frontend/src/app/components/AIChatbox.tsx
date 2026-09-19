@@ -107,7 +107,7 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
       <DialogContent className="max-w-2xl h-[600px] flex flex-col rounded-3xl p-0">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -129,8 +129,8 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                   message.role === "user" 
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-600" 
-                    : "bg-gradient-to-br from-purple-500 to-pink-600"
+                    ? "bg-linear-to-br from-emerald-500 to-teal-600" 
+                    : "bg-linear-to-br from-purple-500 to-pink-600"
                 }`}>
                   {message.role === "user" ? (
                     <User className="h-4 w-4 text-white" />
@@ -141,7 +141,7 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
                 <div className={`flex-1 max-w-[80%] ${message.role === "user" ? "flex justify-end" : ""}`}>
                   <div className={`rounded-2xl px-4 py-3 whitespace-pre-line ${
                     message.role === "user"
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                      ? "bg-linear-to-br from-emerald-500 to-teal-600 text-white"
                       : "bg-gray-100 text-gray-900"
                   }`}>
                     {message.content}
@@ -152,7 +152,7 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
             
             {isTyping && (
               <div className="flex gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
                 <div className="bg-gray-100 rounded-2xl px-4 py-3">
@@ -207,7 +207,7 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
             />
             <Button
               onClick={handleSend}
-              className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shrink-0"
+              className="rounded-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shrink-0"
               size="icon"
             >
               <Send className="h-4 w-4" />

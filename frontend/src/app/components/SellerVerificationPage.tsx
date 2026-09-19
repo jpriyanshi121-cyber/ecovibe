@@ -92,11 +92,11 @@ export function SellerVerificationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-emerald-400 to-teal-600 mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-gray-900 mb-3">Become a Verified Seller</h1>
@@ -119,9 +119,9 @@ export function SellerVerificationPage() {
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                         isCompleted
-                          ? "bg-gradient-to-br from-emerald-400 to-teal-600"
+                          ? "bg-linear-to-br from-emerald-400 to-teal-600"
                           : isCurrent
-                          ? "bg-gradient-to-br from-emerald-400 to-teal-600 ring-4 ring-emerald-100"
+                          ? "bg-linear-to-br from-emerald-400 to-teal-600 ring-4 ring-emerald-100"
                           : "bg-gray-200"
                       }`}
                     >
@@ -138,7 +138,7 @@ export function SellerVerificationPage() {
                   {index < steps.length - 1 && (
                     <div
                       className={`h-1 flex-1 mx-2 rounded transition-all duration-300 ${
-                        isCompleted ? "bg-gradient-to-r from-emerald-400 to-teal-600" : "bg-gray-200"
+                        isCompleted ? "bg-linear-to-r from-emerald-400 to-teal-600" : "bg-gray-200"
                       }`}
                     />
                   )}
@@ -704,14 +704,14 @@ export function SellerVerificationPage() {
           {currentStep === "review" ? (
             <button
               onClick={handleSubmit}
-              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
             >
               Submit for Verification
             </button>
           ) : (
             <button
               onClick={handleNext}
-              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
+              className="px-8 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
             >
               Continue
             </button>

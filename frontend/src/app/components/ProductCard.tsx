@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { MapPin, Heart } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./common/ImageWithFallback";
 import { useState } from "react";
 
 export interface Product {
@@ -30,13 +30,13 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
       className="overflow-hidden cursor-pointer hover:shadow-2xl transition-all duration-300 group border-gray-200 rounded-2xl bg-white" 
       onClick={onClick}
     >
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50">
+      <div className="relative aspect-square overflow-hidden bg-linear-to-br from-gray-100 to-gray-50">
         <ImageWithFallback
           src={product.image}
           alt={product.title}
           className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         <button 
           className={`absolute top-3 right-3 rounded-full p-2.5 shadow-lg transition-all backdrop-blur-sm ${
             isFavorited 
@@ -72,7 +72,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
             {product.location}
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500"></div>
+            <div className="w-6 h-6 rounded-full bg-linear-to-br from-emerald-400 to-teal-500"></div>
             <span className="text-xs text-gray-500">{product.seller.split(' ')[0]}</span>
           </div>
         </div>

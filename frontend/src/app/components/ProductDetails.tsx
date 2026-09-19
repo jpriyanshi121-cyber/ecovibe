@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { MapPin, User, MessageCircle, Share2, Heart, ShieldCheck, Package, Star, ShoppingCart } from "lucide-react";
 import { Product } from "./ProductCard";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./common/ImageWithFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
@@ -74,7 +74,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
         
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 shadow-lg">
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-50 shadow-lg">
               <ImageWithFallback
                 src={product.image}
                 alt={product.title}
@@ -109,7 +109,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
             
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shrink-0">
+                <div className="w-12 h-12 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shrink-0">
                   {product.seller.charAt(0)}
                 </div>
                 <div className="flex-1">
@@ -160,7 +160,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
 
             <div className="border-t border-gray-200 pt-6 space-y-3">
               <Button 
-                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all h-12 rounded-xl"
+                className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all h-12 rounded-xl"
                 onClick={onAddToCart}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
@@ -235,7 +235,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                   <div key={review.id} className="border border-gray-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-500 text-white">
+                        <AvatarFallback className="bg-linear-to-br from-purple-400 to-pink-500 text-white">
                           {review.author.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
@@ -281,7 +281,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
 
             <TabsContent value="seller" className="space-y-4">
               <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-xl">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xl shrink-0">
+                <div className="w-16 h-16 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xl shrink-0">
                   {product.seller.charAt(0)}
                 </div>
                 <div className="flex-1">

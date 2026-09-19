@@ -214,7 +214,7 @@ export function SellItemForm({ open, onClose }: SellItemFormProps) {
             <Button type="button" variant="outline" className="flex-1 h-12 rounded-xl border-gray-300" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all">
+            <Button type="submit" className="flex-1 h-12 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all">
               List Item
             </Button>
           </div>

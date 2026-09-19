@@ -4,7 +4,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Package, Truck, CheckCircle, XCircle, Eye, MessageCircle } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./common/ImageWithFallback";
 
 const orders = [
   {
@@ -94,10 +94,10 @@ export function OrdersPage() {
 
       <Tabs defaultValue="sales" className="space-y-6">
         <TabsList className="bg-white border border-gray-200 p-1 rounded-xl">
-          <TabsTrigger value="sales" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white">
+          <TabsTrigger value="sales" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white">
             My Sales
           </TabsTrigger>
-          <TabsTrigger value="purchases" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white">
+          <TabsTrigger value="purchases" className="rounded-lg data-[state=active]:bg-linear-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white">
             My Purchases
           </TabsTrigger>
         </TabsList>

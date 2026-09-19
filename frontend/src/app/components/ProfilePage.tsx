@@ -23,7 +23,7 @@ export function ProfilePage() {
             <div className="text-center">
               <div className="relative inline-block mb-4">
                 <Avatar className="w-24 h-24">
-                  <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl">
+                  <AvatarFallback className="bg-linear-to-br from-emerald-500 to-teal-600 text-white text-2xl">
                     SM
                   </AvatarFallback>
                 </Avatar>
@@ -151,7 +151,7 @@ export function ProfilePage() {
                 Cancel
               </Button>
               <Button
-                className="flex-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                className="flex-1 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               >
                 Save Changes
               </Button>

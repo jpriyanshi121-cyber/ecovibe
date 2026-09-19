@@ -3,7 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Trash2, Plus, Minus, ShoppingCart, ArrowRight, Tag } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./common/ImageWithFallback";
 import { Input } from "./ui/input";
 import { useState } from "react";
 
@@ -76,7 +76,7 @@ export function CartPage({ onNavigate }: CartPageProps) {
             </div>
             <h3 className="text-gray-900 mb-2">Your cart is empty</h3>
             <p className="text-gray-500 mb-6">Start shopping to add items to your cart</p>
-            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl">
+            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl">
               Browse Products
             </Button>
           </CardContent>
@@ -173,7 +173,7 @@ export function CartPage({ onNavigate }: CartPageProps) {
                   </div>
 
                   <Button 
-                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl"
+                    className="w-full h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl"
                     onClick={() => onNavigate("checkout")}
                   >
                     Proceed to Checkout

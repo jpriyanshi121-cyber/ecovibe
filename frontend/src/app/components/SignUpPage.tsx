@@ -69,7 +69,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
       {/* Background decorative elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl" />
@@ -80,7 +80,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
       <div className="relative max-w-md mx-auto">
         {/* Logo/Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/50 mb-4 transform hover:scale-110 transition-transform duration-300">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/50 mb-4 transform hover:scale-110 transition-transform duration-300">
             <Recycle className="size-8 text-white" />
           </div>
           <h1 className="text-gray-900 mb-2">Join ReCircle</h1>
@@ -90,7 +90,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
         {/* Main Card */}
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-500/10 border border-emerald-100/50 overflow-hidden">
           {/* Gradient header bar */}
-          <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+          <div className="h-2 bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500" />
           
           <div className="p-8">
             <form onSubmit={handleSignUp} className="space-y-6">
@@ -223,7 +223,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
               </div>
 
               {/* Sustainability Message */}
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex gap-3">
+              <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex gap-3">
                 <Leaf className="size-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-gray-700">
                   By joining ReCircle, you're contributing to a sustainable future and helping reduce waste in our community.
@@ -253,7 +253,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full h-12 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200 transform hover:scale-[1.02]"
               >
                 Create Account
               </Button>

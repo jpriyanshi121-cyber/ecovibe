@@ -33,7 +33,7 @@ export function Header({ onSellClick, onAIChatClick, searchQuery, onSearchChange
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate(isLoggedIn ? 'home' : 'login')}>
-            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-2.5 shadow-lg shadow-emerald-200">
+            <div className="bg-linear-to-br from-emerald-500 to-teal-600 rounded-2xl p-2.5 shadow-lg shadow-emerald-200">
               <ShoppingBag className="h-6 w-6 text-white" strokeWidth={2.5} />
             </div>
             <div>
@@ -177,7 +177,7 @@ export function Header({ onSellClick, onAIChatClick, searchQuery, onSearchChange
             {isLoggedIn && (
               <Button
               onClick={onSellClick}
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition-all rounded-full px-6"
+              className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition-all rounded-full px-6"
               >
                 <Plus className="h-5 w-5 mr-2" strokeWidth={2.5} />
                 <span className="hidden sm:inline">Sell Item</span>

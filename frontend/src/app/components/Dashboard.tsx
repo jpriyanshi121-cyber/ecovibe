@@ -34,7 +34,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       </div>
 
       {/* Verification Status Banner */}
-      <div className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-sm">
+      <div className="mb-8 bg-linear-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-sm">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <AlertCircle className="h-6 w-6 text-amber-600" />
@@ -47,7 +47,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="flex flex-wrap gap-3">
               <Button 
                 onClick={() => onNavigate?.("sellerverification")}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
                 <Shield className="h-4 w-4 mr-2" />
                 Start Verification

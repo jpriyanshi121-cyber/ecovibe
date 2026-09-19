@@ -211,7 +211,7 @@ export function EcoReels({ onClose }: EcoReelsProps) {
             alt={currentReel.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/70" />
         </div>
 
         {/* Right Side Actions */}
@@ -256,7 +256,7 @@ export function EcoReels({ onClose }: EcoReelsProps) {
         <div className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-6 space-y-3">
           {/* Creator Info */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
               <span className="text-white text-xs">
                 {currentReel.creator.charAt(0)}
               </span>
@@ -296,7 +296,7 @@ export function EcoReels({ onClose }: EcoReelsProps) {
               </span>
               <Button
                 size="sm"
-                className="h-8 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-lg text-xs"
+                className="h-8 px-4 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-lg text-xs"
               >
                 Shop
               </Button>

@@ -8,7 +8,7 @@ interface HeroProps {
 
 export function Hero({ onSellClick }: HeroProps) {
   return (
-    <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border-b border-emerald-100">
+    <div className="bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 border-b border-emerald-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
@@ -19,7 +19,7 @@ export function Hero({ onSellClick }: HeroProps) {
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-gray-900 leading-tight">
               Give Products a{" "}
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 Second Life
               </span>
             </h1>
@@ -33,7 +33,7 @@ export function Hero({ onSellClick }: HeroProps) {
               <Button 
                 onClick={onSellClick}
                 size="lg"
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all rounded-full px-8"
+                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all rounded-full px-8"
               >
                 Start Selling
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -73,7 +73,7 @@ export function Hero({ onSellClick }: HeroProps) {
                 <h3 className="text-gray-900 mb-2">Great Value</h3>
                 <p className="text-sm text-gray-600">Quality items at fair prices</p>
               </div>
-              <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-xl text-white">
+              <div className="bg-linear-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-xl text-white">
                 <div className="text-4xl mb-2">2.5M+</div>
                 <p className="text-emerald-50">Items saved from landfills</p>
               </div>
