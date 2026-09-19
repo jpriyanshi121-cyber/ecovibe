@@ -27,7 +27,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
               variant={selectedCategory === category.id ? "default" : "outline"}
               className={`cursor-pointer whitespace-nowrap px-5 py-2.5 rounded-full transition-all text-sm ${
                 selectedCategory === category.id
-                  ? "bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md"
+                  ? "bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md text-white"
                   : "hover:bg-gray-50 border-gray-200 bg-white"
               }`}
               onClick={() => onCategoryChange(category.id)}

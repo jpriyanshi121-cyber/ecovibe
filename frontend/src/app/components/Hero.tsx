@@ -33,7 +33,7 @@ export function Hero({ onSellClick }: HeroProps) {
               <Button 
                 onClick={onSellClick}
                 size="lg"
-                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all rounded-full px-8"
+                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all rounded-full px-8 text-white"
               >
                 Start Selling
                 <ArrowRight className="ml-2 h-5 w-5" />

@@ -177,7 +177,7 @@ export function Header({ onSellClick, onAIChatClick, searchQuery, onSearchChange
             {isLoggedIn && (
               <Button
               onClick={onSellClick}
-              className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition-all rounded-full px-6"
+              className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition-all rounded-full px-6 text-white"
               >
                 <Plus className="h-5 w-5 mr-2" strokeWidth={2.5} />
                 <span className="hidden sm:inline">Sell Item</span>
