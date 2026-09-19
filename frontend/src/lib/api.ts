@@ -10,6 +10,15 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
       ...options.headers,
     },
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    let message = `Request failed (${res.status})`;
+    try {
+      const body = await res.json();
+      message = body.message || message;
+    } catch {
+      // response wasn't JSON; keep the generic message
+    }
+    throw new Error(message);
+  }
   return res.json();
 }

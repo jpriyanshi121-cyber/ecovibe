@@ -59,7 +59,7 @@ export function SignUpPage({ onNavigate, onLogin }: SignUpPageProps) {
           password: formData.password,
         }),
       });
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.accessToken);
       toast.success("Account created! Welcome to EcoVibe!");
       onLogin();
       setTimeout(() => onNavigate("home"), 1500);

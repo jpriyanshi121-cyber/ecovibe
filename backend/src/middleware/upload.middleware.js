@@ -25,27 +25,24 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter
+// File filter — accepts images for post/product photos, and video for EcoReels
+const imageMimes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const videoMimes = ["video/mp4", "video/webm", "video/quicktime"];
+
 const fileFilter = (req, file, cb) => {
-  const allowedMimes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
-  
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed"), false);
+  if (file.fieldname === "video") {
+    if (videoMimes.includes(file.mimetype)) return cb(null, true);
+    return cb(new Error("Only mp4, webm or mov videos are allowed"), false);
   }
+  if (imageMimes.includes(file.mimetype)) return cb(null, true);
+  return cb(new Error("Only image files are allowed"), false);
 };
 
 const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
+    fileSize: 50 * 1024 * 1024, // 50MB max (covers short video clips; images stay small in practice)
   },
 });
 

@@ -66,13 +66,15 @@ exports.getPost = async (req, res, next) => {
 // POST /api/posts
 exports.createPost = async (req, res, next) => {
   try {
-    const images = req.files ? req.files.map((f) => `/uploads/${f.filename}`) : [];
+    const images = req.files?.images ? req.files.images.map((f) => `/uploads/${f.filename}`) : [];
+    const video = req.files?.video?.[0] ? `/uploads/${req.files.video[0].filename}` : null;
     const hashtags = (req.body.content.match(/#\w+/g) || []).map((h) => h.replace("#", "").toLowerCase());
 
     const post = await Post.create({
       author: req.user._id,
       content: req.body.content,
       images,
+      video,
       taggedProduct: req.body.taggedProduct || null,
       taggedChallenge: req.body.taggedChallenge || null,
       ecoImpact: req.body.ecoImpact ? JSON.parse(req.body.ecoImpact) : {},

@@ -8,7 +8,7 @@ router.get("/", ctrl.getFeed);
 router.get("/following", protect, ctrl.getFollowingFeed);
 router.get("/:id", ctrl.getPost);
 
-router.post("/", protect, upload.array("images", 4), ctrl.createPost);
+router.post("/", protect, upload.fields([{ name: "images", maxCount: 4 }, { name: "video", maxCount: 1 }]), ctrl.createPost);
 router.delete("/:id", protect, ctrl.deletePost);
 
 router.post("/:id/like", protect, ctrl.likePost);

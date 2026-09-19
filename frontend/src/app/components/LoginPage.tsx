@@ -39,7 +39,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
           password: formData.password,
         }),
       });
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.accessToken);
       toast.success("Welcome back to EcoVibe!");
       onLogin();
       setTimeout(() => onNavigate("home"), 1000);

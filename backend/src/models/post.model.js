@@ -14,6 +14,7 @@ const postSchema = new mongoose.Schema(
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, required: true, maxlength: 1000 },
     images: [{ type: String }],
+    video: { type: String, default: null },
 
     // Optional product tag
     taggedProduct: { type: mongoose.Schema.Types.ObjectId, ref: "Product", default: null },

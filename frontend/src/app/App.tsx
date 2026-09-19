@@ -103,7 +103,16 @@ export default function App() {
     }
     switch (currentPage) {
       case "ecoreels":
-        return <EcoReels onClose={() => setCurrentPage("home")} />;
+        return (
+          <EcoReels
+            onClose={() => setCurrentPage("home")}
+            onShopProduct={(productId) => {
+              const found = products.find((p) => p.id === productId);
+              setCurrentPage("home");
+              if (found) setSelectedProduct(found);
+            }}
+          />
+        );
       case "profile":
         return <ProfilePage />;
       case "dashboard":

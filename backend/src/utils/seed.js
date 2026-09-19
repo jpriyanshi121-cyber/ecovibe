@@ -13,7 +13,7 @@ const seed = async () => {
 
   // Users
   const [admin, seller, user1, sarah, mike, techRenewals, artisan, bookLover, ecoCrafts, vintageFinds, ecoShop] =
-    await User.insertMany([
+    await User.create([
       { name: "EcoVibe Admin", email: "admin@ecovibe.com", password: "password123", role: "admin", ecoScore: 9999, isVerified: true },
       { name: "Green Goods Co.", email: "seller@ecovibe.com", password: "password123", role: "seller", ecoScore: 850, isVerified: true, bio: "We sell 100% sustainable products." },
       { name: "Alex Green", email: "alex@example.com", password: "password123", role: "user", ecoScore: 320, carbonSaved: 45, treesPlanted: 3, bio: "Making eco choices every day 🌱" },
@@ -157,6 +157,7 @@ const seed = async () => {
       author: techRenewals._id,
       content: "Another laptop saved from the landfill! Refurbished and ready for its next owner 💻♻️ #ewaste #sustainable",
       taggedProduct: products[2]._id,
+      video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
       hashtags: ["ewaste", "sustainable"],
       likesCount: 34,
     },
