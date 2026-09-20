@@ -11,6 +11,7 @@ const postRoutes = require("./routes/post.routes");
 const challengeRoutes = require("./routes/challenge.routes");
 const notificationRoutes = require("./routes/notification.routes");
 const orderRoutes = require("./routes/order.routes");
+const chatRoutes = require("./routes/chat.routes");
 
 const { errorHandler, notFound } = require("./middleware/error.middleware");
 
@@ -83,6 +84,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/challenges", challengeRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/chat", chatRoutes);
 
 // ─── Error Handling ────────────────────────────────────────────────────────
 app.use(notFound);

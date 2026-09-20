@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Send, Bot, User, Sparkles, Lightbulb } from "lucide-react";
+import { apiFetch } from "../../lib/api";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -35,50 +37,8 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
     }
   }, [messages]);
 
-  const generateResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes("plastic bottle") || lowerMessage.includes("bottles")) {
-      return "Great! Plastic bottles can be transformed into amazing products:\n\n🌿 **Vertical Garden Planters** - Cut bottles in half and stack them to create a wall garden\n💡 **Lamp Shades** - Cut decorative patterns and add LED lights\n🎨 **Organizers** - Cut and paint to make desk organizers or jewelry holders\n🚿 **Drip Irrigation System** - Poke holes for a DIY watering system\n\nWould you like detailed instructions for any of these?";
-    }
-    
-    if (lowerMessage.includes("cardboard") || lowerMessage.includes("box")) {
-      return "Cardboard is incredibly versatile! Here are some ideas:\n\n📦 **Storage Boxes** - Decorate and organize your space\n🎭 **Kids' Playhouse** - Build a castle or fort\n🖼️ **Picture Frames** - Cut and paint for unique wall art\n📚 **Book Organizers** - Create custom shelving\n🐱 **Pet Furniture** - Cats love cardboard scratchers!\n\nWhich project interests you?";
-    }
-    
-    if (lowerMessage.includes("glass jar") || lowerMessage.includes("jars")) {
-      return "Glass jars are perfect for upcycling! Try these:\n\n🕯️ **Candle Holders** - Add candles or fairy lights\n🌱 **Terrariums** - Create mini gardens\n🍴 **Kitchen Storage** - Store dry goods, spices\n💝 **Gift Containers** - Fill with homemade treats\n✨ **Bathroom Organizers** - Cotton balls, Q-tips storage\n\nShall I provide step-by-step instructions?";
-    }
-    
-    if (lowerMessage.includes("old clothes") || lowerMessage.includes("fabric") || lowerMessage.includes("textile")) {
-      return "Old textiles can have new life! Consider:\n\n🛍️ **Tote Bags** - Sew reusable shopping bags\n🧺 **Rag Rugs** - Braid or weave into colorful rugs\n🪆 **Pillow Covers** - Create decorative cushions\n🧸 **Stuffed Toys** - Make keepsakes for kids\n🧹 **Cleaning Rags** - Cut into reusable cloths\n\nWhat's your skill level with sewing?";
-    }
-    
-    if (lowerMessage.includes("wood") || lowerMessage.includes("pallet") || lowerMessage.includes("lumber")) {
-      return "Wood waste can create beautiful items:\n\n🪑 **Furniture** - Tables, benches, shelves\n🖼️ **Wall Art** - Rustic signs or geometric designs\n🌿 **Planters** - Garden boxes or vertical gardens\n🔨 **Tool Storage** - Pegboards or racks\n🏠 **Birdhouses** - Homes for garden birds\n\nDo you have basic woodworking tools?";
-    }
-    
-    if (lowerMessage.includes("tin can") || lowerMessage.includes("aluminum")) {
-      return "Tin cans are great for creative projects:\n\n✏️ **Desk Organizers** - Paint and decorate for pens/pencils\n🕯️ **Lanterns** - Punch holes for decorative patterns\n🌺 **Planters** - Small herb gardens\n🎨 **Paint Can Storage** - Organize art supplies\n🔔 **Wind Chimes** - String together for garden decor\n\nInterested in any specific project?";
-    }
-    
-    if (lowerMessage.includes("newspaper") || lowerMessage.includes("magazine")) {
-      return "Paper waste has many creative uses:\n\n🎁 **Gift Wrapping** - Unique, eco-friendly wrap\n🧺 **Paper Baskets** - Weave into sturdy containers\n🎨 **Papier-Mâché** - Create sculptures or bowls\n📰 **Seed Pots** - Biodegradable plant starters\n🖼️ **Wall Art** - Collages or rolled paper designs\n\nWant to learn a specific technique?";
-    }
-    
-    if (lowerMessage.includes("tire") || lowerMessage.includes("rubber")) {
-      return "Old tires can be transformed into:\n\n🪴 **Garden Planters** - Stack and paint for raised beds\n🏋️ **Outdoor Furniture** - Ottomans or tables\n🛝 **Playground Equipment** - Swings for kids\n👢 **Doormats** - Cut and arrange pieces\n🎨 **Art Sculptures** - Creative garden decorations\n\nThese projects work great for outdoor spaces!";
-    }
-    
-    if (lowerMessage.includes("electronic") || lowerMessage.includes("computer") || lowerMessage.includes("phone")) {
-      return "⚠️ Electronics should be handled carefully:\n\n🔌 **Donate/Refurbish** - Many parts can be reused\n🎨 **Art Projects** - Circuit boards make unique art\n💡 **Learning Tools** - Disassemble for STEM education\n♻️ **E-waste Recycling** - Find certified recyclers\n\n⚡ Remember: Always remove batteries and handle safely! Contact local e-waste facilities for proper disposal.";
-    }
-    
-    return "That sounds interesting! To give you the best upcycling ideas, could you tell me more about:\n\n📦 The quantity of material you have\n🎨 Your crafting skill level\n⏰ Time you can dedicate\n🎯 What type of product you need (decor, storage, furniture, etc.)\n\nThe more details you share, the better suggestions I can provide!";
-  };
-
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -86,25 +46,32 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
       content: input
     };
 
+    const historyForApi = messages.map((m) => ({ role: m.role, content: m.content }));
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const response = generateResponse(input);
+    try {
+      const res = await apiFetch("/chat", {
+        method: "POST",
+        body: JSON.stringify({ message: userMessage.content, history: historyForApi }),
+      });
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response
+        content: res.reply
       };
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (err: any) {
+      toast.error(err?.message || "The AI assistant is temporarily unavailable");
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl h-[600px] flex flex-col rounded-3xl p-0">
+      <DialogContent className="max-w-2xl h-[600px] flex flex-col rounded-3xl p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-3">
             <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
@@ -120,7 +87,7 @@ export function AIChatbox({ open, onClose }: AIChatboxProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 py-4" ref={scrollRef}>
+        <ScrollArea className="flex-1 min-h-0 px-6 py-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((message) => (
               <div
