@@ -1,12 +1,16 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { MapPin, User, MessageCircle, Share2, Heart, ShieldCheck, Package, Star, ShoppingCart } from "lucide-react";
+import { Textarea } from "./ui/textarea";
+import { MapPin, ShieldCheck, Package, Star, ShoppingCart, Heart } from "lucide-react";
 import { Product } from "./ProductCard";
 import { ImageWithFallback } from "./common/ImageWithFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { apiFetch, getImageUrl } from "../../lib/api";
+import { toast } from "sonner";
 
 interface ProductDetailsProps {
   product: Product | null;
@@ -15,37 +19,78 @@ interface ProductDetailsProps {
   onAddToCart?: (product: Product) => void;
 }
 
-const reviews = [
-  {
-    id: 1,
-    author: "Emily Johnson",
-    rating: 5,
-    date: "Nov 5, 2025",
-    comment: "Absolutely love this! Exactly as described and in great condition. The seller was very responsive and helpful.",
-    verified: true
-  },
-  {
-    id: 2,
-    author: "Michael Brown",
-    rating: 4,
-    date: "Nov 1, 2025",
-    comment: "Good quality item. Minor wear but that was mentioned in the description. Very happy with the purchase!",
-    verified: true
-  },
-  {
-    id: 3,
-    author: "Jessica Lee",
-    rating: 5,
-    date: "Oct 28, 2025",
-    comment: "Amazing find! So glad I chose to buy recycled. Great value and eco-friendly too!",
-    verified: true
-  },
-];
+interface Review {
+  _id: string;
+  user: { name: string; avatar?: string };
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
 
 export function ProductDetails({ product, open, onClose, onAddToCart }: ProductDetailsProps) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [numReviews, setNumReviews] = useState(0);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const [myRating, setMyRating] = useState(0);
+  const [myComment, setMyComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (!open || !product) return;
+    const loadDetails = async () => {
+      setReviewsLoading(true);
+      try {
+        const res = await apiFetch(`/products/${product.id}`);
+        setReviews(res.product.reviews || []);
+        setAverageRating(res.product.averageRating || 0);
+        setNumReviews(res.product.numReviews || 0);
+      } catch (err) {
+        // Non-critical — leave reviews empty rather than blocking the dialog
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    loadDetails();
+  }, [open, product?.id]);
+
   if (!product) return null;
 
-  const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const handleToggleSave = async () => {
+    try {
+      const res = await apiFetch(`/users/me/saved/${product.id}`, { method: "POST" });
+      setSaved(res.saved);
+      toast.success(res.saved ? "Saved to your list" : "Removed from your list");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't update saved items");
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (myRating === 0) {
+      toast.error("Please select a star rating");
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const res = await apiFetch(`/products/${product.id}/reviews`, {
+        method: "POST",
+        body: JSON.stringify({ rating: myRating, comment: myComment }),
+      });
+      setReviews(res.product.reviews || []);
+      setAverageRating(res.product.averageRating || 0);
+      setNumReviews(res.product.numReviews || 0);
+      setMyRating(0);
+      setMyComment("");
+      toast.success("Review submitted!");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't submit review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -61,17 +106,17 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                 <Star
                   key={star}
                   className={`h-4 w-4 ${
-                    star <= averageRating
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-300"
+                    star <= Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-sm text-gray-600">({reviews.length} reviews)</span>
+            <span className="text-sm text-gray-600">
+              {numReviews > 0 ? `${averageRating.toFixed(1)} (${numReviews} reviews)` : "No reviews yet"}
+            </span>
           </div>
         </DialogHeader>
-        
+
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-50 shadow-lg">
@@ -80,17 +125,12 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                 alt={product.title}
                 className="object-cover w-full h-full"
               />
-              <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all">
-                <Heart className="h-5 w-5 text-gray-700" />
+              <button
+                onClick={handleToggleSave}
+                className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all"
+              >
+                <Heart className={`h-5 w-5 ${saved ? "fill-red-500 text-red-500" : "text-gray-700"}`} />
               </button>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-3">
-              <div className="aspect-square rounded-xl bg-gray-100"></div>
-              <div className="aspect-square rounded-xl bg-gray-100"></div>
-              <div className="aspect-square rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                +3
-              </div>
             </div>
           </div>
 
@@ -102,11 +142,8 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                   {product.condition}
                 </Badge>
               </div>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Share2 className="h-5 w-5" />
-              </Button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-12 h-12 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shrink-0">
@@ -115,9 +152,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-gray-900">{product.seller}</span>
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <p className="text-sm text-gray-600">Verified seller • 98% positive reviews</p>
                 </div>
               </div>
 
@@ -130,11 +165,6 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
             <div className="border-t border-gray-200 pt-6">
               <h4 className="text-gray-900 mb-3">Description</h4>
               <p className="text-gray-600 leading-relaxed">{product.description}</p>
-              <p className="text-gray-600 leading-relaxed mt-3">
-                This item has been carefully inspected and is ready for its next home. 
-                By choosing pre-loved items, you're making a sustainable choice that helps 
-                reduce waste and protect our environment.
-              </p>
             </div>
 
             <div className="border-t border-gray-200 pt-6">
@@ -151,31 +181,22 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <Package className="h-5 w-5 text-emerald-600 shrink-0" />
-              <p className="text-sm text-emerald-900">
-                <span>Free local pickup available</span>
-              </p>
-            </div>
-
             <div className="border-t border-gray-200 pt-6 space-y-3">
-              <Button 
+              <Button
                 className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all h-12 rounded-xl"
                 onClick={() => product && onAddToCart?.(product)}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart
               </Button>
-              <div className="grid grid-cols-2 gap-3">
-                <Button className="rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-0">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Contact
-                </Button>
-                <Button variant="outline" className="rounded-xl border-gray-300">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                className="w-full rounded-xl border-gray-300"
+                onClick={handleToggleSave}
+              >
+                <Heart className={`h-4 w-4 mr-2 ${saved ? "fill-red-500 text-red-500" : ""}`} />
+                {saved ? "Saved" : "Save"}
+              </Button>
             </div>
           </div>
         </div>
@@ -185,7 +206,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
           <Tabs defaultValue="reviews" className="space-y-4">
             <TabsList className="bg-gray-100 p-1 rounded-xl">
               <TabsTrigger value="reviews" className="rounded-lg">
-                Customer Reviews ({reviews.length})
+                Customer Reviews ({numReviews})
               </TabsTrigger>
               <TabsTrigger value="seller" className="rounded-lg">
                 Seller Info
@@ -193,90 +214,116 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
             </TabsList>
 
             <TabsContent value="reviews" className="space-y-4">
-              <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl">
-                <div className="text-center">
-                  <div className="text-4xl text-gray-900 mb-1">{averageRating.toFixed(1)}</div>
-                  <div className="flex items-center gap-1 mb-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-4 w-4 ${
-                          star <= averageRating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600">{reviews.length} reviews</p>
-                </div>
-                <div className="flex-1">
-                  {[5, 4, 3, 2, 1].map((rating) => {
-                    const count = reviews.filter(r => r.rating === rating).length;
-                    const percentage = (count / reviews.length) * 100;
-                    return (
-                      <div key={rating} className="flex items-center gap-2 mb-1">
-                        <span className="text-sm text-gray-600 w-8">{rating}★</span>
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-yellow-400"
-                            style={{ width: `${percentage}%` }}
-                          />
+              {reviewsLoading ? (
+                <p className="text-sm text-gray-400 text-center py-6">Loading reviews...</p>
+              ) : (
+                <>
+                  {numReviews > 0 && (
+                    <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl">
+                      <div className="text-center">
+                        <div className="text-4xl text-gray-900 mb-1">{averageRating.toFixed(1)}</div>
+                        <div className="flex items-center gap-1 mb-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-4 w-4 ${
+                                star <= Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                              }`}
+                            />
+                          ))}
                         </div>
-                        <span className="text-sm text-gray-600 w-8">{count}</span>
+                        <p className="text-sm text-gray-600">{numReviews} reviews</p>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-linear-to-br from-purple-400 to-pink-500 text-white">
-                          {review.author.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-900">{review.author}</span>
-                              {review.verified && (
-                                <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs px-2 py-0">
-                                  Verified
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="flex items-center gap-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <Star
-                                    key={star}
-                                    className={`h-3 w-3 ${
-                                      star <= review.rating
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-gray-300"
-                                    }`}
-                                  />
-                                ))}
+                        {[5, 4, 3, 2, 1].map((rating) => {
+                          const count = reviews.filter((r) => r.rating === rating).length;
+                          const percentage = numReviews > 0 ? (count / numReviews) * 100 : 0;
+                          return (
+                            <div key={rating} className="flex items-center gap-2 mb-1">
+                              <span className="text-sm text-gray-600 w-8">{rating}★</span>
+                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full bg-yellow-400" style={{ width: `${percentage}%` }} />
                               </div>
-                              <span className="text-xs text-gray-500">{review.date}</span>
+                              <span className="text-sm text-gray-600 w-8">{count}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {reviews.length === 0 ? (
+                      <p className="text-sm text-gray-400 text-center py-6">
+                        No reviews yet — be the first to review this item!
+                      </p>
+                    ) : (
+                      reviews.map((review) => (
+                        <div key={review._id} className="border border-gray-200 rounded-xl p-4">
+                          <div className="flex items-start gap-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className="bg-linear-to-br from-purple-400 to-pink-500 text-white">
+                                {review.user?.name?.charAt(0) || "?"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <div>
+                                  <span className="text-sm text-gray-900">{review.user?.name || "EcoVibe Member"}</span>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex items-center gap-1">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                          key={star}
+                                          className={`h-3 w-3 ${
+                                            star <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
+                                    <span className="text-xs text-gray-500">
+                                      {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              {review.comment && <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>}
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
-                      </div>
-                    </div>
+                      ))
+                    )}
                   </div>
-                ))}
-              </div>
 
-              <Button variant="outline" className="w-full rounded-xl">
-                Write a Review
-              </Button>
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                    <p className="text-sm text-gray-900">Write a Review</p>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button key={star} type="button" onClick={() => setMyRating(star)}>
+                          <Star
+                            className={`h-6 w-6 ${
+                              star <= myRating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <Textarea
+                      placeholder="Share your experience with this item..."
+                      value={myComment}
+                      onChange={(e) => setMyComment(e.target.value)}
+                      className="rounded-xl border-gray-300 resize-none"
+                    />
+                    <Button
+                      onClick={handleSubmitReview}
+                      disabled={submittingReview}
+                      className="w-full rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-60"
+                    >
+                      {submittingReview ? "Submitting..." : "Submit Review"}
+                    </Button>
+                  </div>
+                </>
+              )}
             </TabsContent>
 
             <TabsContent value="seller" className="space-y-4">
@@ -289,27 +336,9 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
                     <h3 className="text-gray-900">{product.seller}</h3>
                     <ShieldCheck className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                    <span className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      4.9 Rating
-                    </span>
-                    <span>47 Sales</span>
-                    <span>98% Positive</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Passionate about sustainable living and giving items a second life. 
-                    Selling quality pre-loved items to help reduce waste!
+                  <p className="text-sm text-gray-600">
+                    {product.location ? `Based in ${product.location}` : "EcoVibe seller"}
                   </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 rounded-xl">
-                      View Profile
-                    </Button>
-                    <Button size="sm" variant="outline" className="rounded-xl">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Message
-                    </Button>
-                  </div>
                 </div>
               </div>
             </TabsContent>

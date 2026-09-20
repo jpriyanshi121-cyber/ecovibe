@@ -5,6 +5,7 @@ const { protect } = require("../middleware/auth.middleware");
 const upload = require("../middleware/upload.middleware");
 
 router.get("/leaderboard", ctrl.getLeaderboard);
+router.get("/me", protect, ctrl.getMe);
 router.get("/me/saved", protect, ctrl.getSavedProducts);
 router.put("/me", protect, upload.single("avatar"), ctrl.updateProfile);
 router.post("/me/saved/:productId", protect, ctrl.toggleSavedProduct);

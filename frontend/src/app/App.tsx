@@ -156,7 +156,7 @@ export default function App() {
       case "profile":
         return <ProfilePage />;
       case "dashboard":
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return <Dashboard onNavigate={setCurrentPage} onAddItem={() => setShowSellForm(true)} />;
       case "orders":
         return <OrdersPage />;
       case "cart":

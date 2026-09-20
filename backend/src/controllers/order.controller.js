@@ -96,6 +96,48 @@ exports.getMySales = async (req, res, next) => {
     next(err);
   }
 };
+// GET /api/orders/dashboard/mine — real seller analytics: revenue, sales, top products, monthly trend
+exports.getSellerDashboard = async (req, res, next) => {
+  try {
+    const sellerId = req.user._id.toString();
+    const orders = await Order.find({ "items.seller": sellerId });
+
+    let totalRevenue = 0;
+    let totalSales = 0;
+    const productStats = {};
+    const monthly = {};
+
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
+        if (item.seller.toString() !== sellerId) return;
+        const lineTotal = item.price * item.quantity;
+        totalRevenue += lineTotal;
+        totalSales += item.quantity;
+
+        if (!productStats[item.name]) productStats[item.name] = { name: item.name, sales: 0, revenue: 0 };
+        productStats[item.name].sales += item.quantity;
+        productStats[item.name].revenue += lineTotal;
+
+        const monthKey = order.createdAt.toLocaleString("en-US", { month: "short", year: "2-digit" });
+        if (!monthly[monthKey]) monthly[monthKey] = { month: monthKey, sales: 0, revenue: 0 };
+        monthly[monthKey].sales += item.quantity;
+        monthly[monthKey].revenue += lineTotal;
+      });
+    });
+
+    const activeListings = await Product.countDocuments({ seller: sellerId, isActive: true });
+    const topProducts = Object.values(productStats).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+    const salesData = Object.values(monthly);
+
+    res.json({
+      success: true,
+      dashboard: { totalRevenue, totalSales, activeListings, topProducts, salesData, totalOrders: orders.length },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getOrder = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);

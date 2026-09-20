@@ -5,6 +5,15 @@ const Notification = require("../models/notification.model");
 const { sendPushToUser } = require("../utils/push");
 
 // GET /api/users/:id
+// GET /api/users/me — the logged-in user's own full profile
+exports.getMe = async (req, res, next) => {
+  try {
+    res.json({ success: true, user: req.user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).populate("followers", "name avatar").populate("following", "name avatar");
