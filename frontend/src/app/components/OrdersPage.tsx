@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Package, Truck, CheckCircle, XCircle, Clock } from "lucide-react";
 import { ImageWithFallback } from "./common/ImageWithFallback";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, getImageUrl } from "../../lib/api";
 
 interface OrderItem {
   name: string;
@@ -122,7 +122,7 @@ export function OrdersPage() {
                     {order.items.map((item, idx) => (
                       <div key={idx} className="flex gap-4 items-center">
                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                          <ImageWithFallback src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <ImageWithFallback src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-900 truncate">{item.name}</p>
@@ -166,7 +166,7 @@ export function OrdersPage() {
                     {sale.items.map((item, idx) => (
                       <div key={idx} className="flex gap-4 items-center">
                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                          <ImageWithFallback src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <ImageWithFallback src={getImageUrl(item.image)} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-900 truncate">{item.name}</p>

@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Heart, ShoppingBag, Share2, MessageCircle, Send } from "lucide-react";
 import { Button } from "./ui/button";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, getImageUrl } from "../../lib/api";
 import { toast } from "sonner";
 
 interface Comment {
@@ -64,10 +64,10 @@ export function EcoReels({ onClose, onShopProduct }: EcoReelsProps) {
         const mapped: Reel[] = (data.posts || []).map((p: any) => ({
           id: p._id,
           thumbnail:
-            (p.images && p.images[0]) ||
-            (p.taggedProduct?.images && p.taggedProduct.images[0]) ||
+            getImageUrl(p.images?.[0]) ||
+            getImageUrl(p.taggedProduct?.images?.[0]) ||
             FALLBACK_IMAGE,
-          video: p.video || null,
+          video: getImageUrl(p.video) || null,
           creator: p.author?.name || "EcoVibe Member",
           authorId: p.author?._id || null,
           content: p.content,

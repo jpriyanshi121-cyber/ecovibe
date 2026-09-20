@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode (Vite) */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Loosely typed for now — this codebase wasn't originally type-checked,
+       so full strict mode would surface a large backlog of pre-existing
+       issues at once. Tighten this incrementally later. */
+    "strict": false,
+    "noImplicitAny": false,
+    "allowJs": true,
+
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}

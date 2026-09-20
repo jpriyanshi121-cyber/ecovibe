@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { apiFetch } from "../lib/api";
+import { apiFetch, getImageUrl } from "../lib/api";
 import { Header } from "./components/Header";
 import { CategoryFilter } from "./components/CategoryFilter";
 import { ProductCard, Product } from "./components/ProductCard";
@@ -50,30 +50,31 @@ export default function App() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState(false);
 
+  const loadProducts = async () => {
+    setProductsLoading(true);
+    setProductsError(false);
+    try {
+      const data = await apiFetch("/products");
+      const mapped: Product[] = (data.products || []).map((p: any) => ({
+        id: p._id,
+        title: p.name,
+        price: p.price,
+        category: p.category,
+        condition: p.condition || "Good",
+        location: p.location || "",
+        image: getImageUrl(p.images?.[0]) || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800",
+        seller: p.seller?.name || "EcoVibe Seller",
+        description: p.description,
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      setProductsError(true);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadProducts = async () => {
-      setProductsLoading(true);
-      setProductsError(false);
-      try {
-        const data = await apiFetch("/products");
-        const mapped: Product[] = (data.products || []).map((p: any) => ({
-          id: p._id,
-          title: p.name,
-          price: p.price,
-          category: p.category,
-          condition: p.condition || "Good",
-          location: p.location || "",
-          image: (p.images && p.images[0]) || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800",
-          seller: p.seller?.name || "EcoVibe Seller",
-          description: p.description,
-        }));
-        setProducts(mapped);
-      } catch (err) {
-        setProductsError(true);
-      } finally {
-        setProductsLoading(false);
-      }
-    };
     loadProducts();
   }, []);
 
@@ -281,6 +282,7 @@ export default function App() {
       <SellItemForm
         open={showSellForm}
         onClose={() => setShowSellForm(false)}
+        onItemListed={loadProducts}
       />
 
       <AIChatbox

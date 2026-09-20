@@ -8,13 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Upload, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { apiFetch } from "../../lib/api";
 
 interface SellItemFormProps {
   open: boolean;
   onClose: () => void;
+  onItemListed?: () => void;
 }
 
-export function SellItemForm({ open, onClose }: SellItemFormProps) {
+export function SellItemForm({ open, onClose, onItemListed }: SellItemFormProps) {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -25,6 +27,7 @@ export function SellItemForm({ open, onClose }: SellItemFormProps) {
   });
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -45,19 +48,53 @@ export function SellItemForm({ open, onClose }: SellItemFormProps) {
     setPreviews(newPreviews);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setFormData({ title: "", price: "", category: "", condition: "", location: "", description: "" });
+    setImages([]);
+    setPreviews([]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (images.length === 0) {
       toast.error("Please upload at least one photo");
       return;
     }
-    toast.success("Item listed successfully!", {
-      description: "Your item is now live on EcoVibe!",
-    });
-    onClose();
-    setFormData({ title: "", price: "", category: "", condition: "", location: "", description: "" });
-    setImages([]);
-    setPreviews([]);
+    if (!formData.category || !formData.condition) {
+      toast.error("Please select a category and condition");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const body = new FormData();
+      body.append("name", formData.title);
+      body.append("price", formData.price);
+      body.append("category", formData.category);
+      body.append("condition", formData.condition);
+      body.append("location", formData.location);
+      body.append("description", formData.description);
+      images.forEach((file) => body.append("images", file));
+
+      await apiFetch("/products", { method: "POST", body });
+
+      toast.success("Item listed successfully!", {
+        description: "Your item is now live on EcoVibe!",
+      });
+      onItemListed?.();
+      onClose();
+      resetForm();
+    } catch (err: any) {
+      if (err?.message?.toLowerCase().includes("role")) {
+        toast.error("Only seller accounts can list items", {
+          description: "Complete seller verification to start selling",
+        });
+      } else {
+        toast.error(err?.message || "Couldn't list item. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -166,10 +203,10 @@ export function SellItemForm({ open, onClose }: SellItemFormProps) {
                   <SelectValue placeholder="Select condition" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="New">New</SelectItem>
                   <SelectItem value="Like New">Like New</SelectItem>
                   <SelectItem value="Good">Good</SelectItem>
                   <SelectItem value="Fair">Fair</SelectItem>
-                  <SelectItem value="Needs Repair">Needs Repair</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -214,8 +251,8 @@ export function SellItemForm({ open, onClose }: SellItemFormProps) {
             <Button type="button" variant="outline" className="flex-1 h-12 rounded-xl border-gray-300" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 h-12 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all">
-              List Item
+            <Button type="submit" disabled={submitting} className="flex-1 h-12 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-60">
+              {submitting ? "Listing..." : "List Item"}
             </Button>
           </div>
         </form>
