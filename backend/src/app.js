@@ -10,6 +10,7 @@ const productRoutes = require("./routes/product.routes");
 const postRoutes = require("./routes/post.routes");
 const challengeRoutes = require("./routes/challenge.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const orderRoutes = require("./routes/order.routes");
 
 const { errorHandler, notFound } = require("./middleware/error.middleware");
 
@@ -81,6 +82,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/challenges", challengeRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/orders", orderRoutes);
 
 // ─── Error Handling ────────────────────────────────────────────────────────
 app.use(notFound);

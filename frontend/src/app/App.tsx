@@ -33,7 +33,18 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showSellForm, setShowSellForm] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
-  const [cartCount, setCartCount] = useState(2);
+  const [cartItems, setCartItems] = useState<{ productId: string; quantity: number }[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("cartItems") || "[]");
+    } catch {
+      return [];
+    }
+  });
+  const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -87,14 +98,42 @@ export default function App() {
     return matchesCategory && matchesSearch;
   });
 
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
+  const handleAddToCart = (product: Product) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.productId === product.id);
+      if (existing) {
+        return prev.map((i) =>
+          i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      }
+      return [...prev, { productId: product.id, quantity: 1 }];
+    });
     toast.success("Item added to cart!", {
       description: "Check your cart to proceed to checkout",
       duration: 3000,
     });
     setSelectedProduct(null);
   };
+
+  const updateCartQuantity = (productId: string, change: number) => {
+    setCartItems((prev) =>
+      prev.map((i) =>
+        i.productId === productId ? { ...i, quantity: Math.max(1, i.quantity + change) } : i
+      )
+    );
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCartItems((prev) => prev.filter((i) => i.productId !== productId));
+  };
+
+  // Full cart items with product details joined in, for CartPage/CheckoutPage display
+  const cartItemsWithDetails = cartItems
+    .map((ci) => {
+      const product = products.find((p) => p.id === ci.productId);
+      return product ? { ...product, quantity: ci.quantity } : null;
+    })
+    .filter((i): i is Product & { quantity: number } => i !== null);
 
   const renderPage = () => {
     if (!isLoggedIn && ['dashboard', 'profile', 'orders', 'cart', 'checkout', 'sellerverification', 'ecoreels'].includes(currentPage)) {
@@ -120,9 +159,22 @@ export default function App() {
       case "orders":
         return <OrdersPage />;
       case "cart":
-        return <CartPage onNavigate={setCurrentPage} />;
+        return (
+          <CartPage
+            onNavigate={setCurrentPage}
+            cartItems={cartItemsWithDetails}
+            onUpdateQuantity={updateCartQuantity}
+            onRemoveItem={removeFromCart}
+          />
+        );
       case "checkout":
-        return <CheckoutPage onNavigate={setCurrentPage} />;
+        return (
+          <CheckoutPage
+            onNavigate={setCurrentPage}
+            cartItems={cartItemsWithDetails}
+            onOrderPlaced={() => setCartItems([])}
+          />
+        );
       case "help":
         return <HelpPage />;
       case "signup":

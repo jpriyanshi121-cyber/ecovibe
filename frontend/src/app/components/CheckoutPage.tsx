@@ -6,10 +6,10 @@ import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Checkbox } from "./ui/checkbox";
-import { 
-  ArrowLeft, 
-  CreditCard, 
-  Wallet, 
+import {
+  ArrowLeft,
+  CreditCard,
+  Wallet,
   Smartphone,
   Lock,
   MapPin,
@@ -19,40 +19,16 @@ import {
   Truck
 } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "../../lib/api";
+import { Product } from "./ProductCard";
 
 interface CheckoutPageProps {
   onNavigate: (page: string) => void;
+  cartItems: (Product & { quantity: number })[];
+  onOrderPlaced: () => void;
 }
 
-interface CartItem {
-  id: string;
-  title: string;
-  price: number;
-  quantity: number;
-  image: string;
-  seller: string;
-}
-
-const mockCartItems: CartItem[] = [
-  {
-    id: "1",
-    title: "Vintage Oak Dining Table",
-    price: 245,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1668955254766-1bb2de25cf16?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xlZCUyMGZ1cm5pdHVyZXxlbnwxfHx8fDE3NjI4ODI4MDV8MA&ixlib=rb-4.1.0&q=80&w=400",
-    seller: "Sarah Miller"
-  },
-  {
-    id: "2",
-    title: "Vintage Denim Jacket Collection",
-    price: 45,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1614990354198-b06764dcb13c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYyODgyODA1fDA&ixlib=rb-4.1.0&q=80&w=400",
-    seller: "Mike Chen"
-  }
-];
-
-export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
+export function CheckoutPage({ onNavigate, cartItems, onOrderPlaced }: CheckoutPageProps) {
   const [shippingInfo, setShippingInfo] = useState({
     fullName: "",
     email: "",
@@ -72,12 +48,12 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     cvv: ""
   });
 
-  const [sameAsShipping, setSameAsShipping] = useState(true);
   const [saveInfo, setSaveInfo] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
 
-  const subtotal = mockCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = 15;
-  const tax = subtotal * 0.08;
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = cartItems.length > 0 ? 15 : 0;
+  const tax = Math.round(subtotal * 0.08 * 100) / 100;
   const carbonOffset = 5; // Fixed carbon offset fee
   const total = subtotal + shipping + tax + carbonOffset;
 
@@ -89,11 +65,15 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     setCardInfo(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
-    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.address) {
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    if (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.address || !shippingInfo.city || !shippingInfo.state || !shippingInfo.zipCode) {
       toast.error("Please fill in all required shipping information");
       return;
     }
@@ -103,15 +83,37 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
       return;
     }
 
-    // Simulate successful order
-    toast.success("Order placed successfully!", {
-      description: "Thank you for supporting sustainable shopping!",
-      duration: 4000,
-    });
+    setPlacingOrder(true);
+    try {
+      await apiFetch("/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          cartItems: cartItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
+          shippingAddress: {
+            fullName: shippingInfo.fullName,
+            phone: shippingInfo.phone,
+            line1: shippingInfo.address,
+            city: shippingInfo.city,
+            state: shippingInfo.state,
+            zip: shippingInfo.zipCode,
+          },
+        }),
+      });
 
-    setTimeout(() => {
-      onNavigate("orders");
-    }, 2000);
+      toast.success("Order placed successfully!", {
+        description: "Thank you for supporting sustainable shopping!",
+        duration: 4000,
+      });
+
+      onOrderPlaced();
+      setTimeout(() => {
+        onNavigate("orders");
+      }, 1500);
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't place order. Please try again.");
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   return (
@@ -166,7 +168,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email">Email</Label>
                       <Input
                         id="email"
                         type="email"
@@ -179,7 +181,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone">Phone Number *</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -257,29 +259,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                         <p className="text-sm text-gray-500">5-7 business days</p>
                       </div>
                     </div>
-                    <span className="text-emerald-600">₹150</span>
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-300 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="express" id="express" className="data-[state=checked]:border-emerald-500 data-[state=checked]:text-emerald-500" />
-                      <div>
-                        <p className="text-gray-900">Express Delivery</p>
-                        <p className="text-sm text-gray-500">2-3 business days</p>
-                      </div>
-                    </div>
-                    <span className="text-emerald-600">₹250</span>
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-300 transition-all has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value="pickup" id="pickup" className="data-[state=checked]:border-emerald-500 data-[state=checked]:text-emerald-500" />
-                      <div>
-                        <p className="text-gray-900">Local Pickup</p>
-                        <p className="text-sm text-gray-500">Pick up from seller</p>
-                      </div>
-                    </div>
-                    <span className="text-emerald-600">Free</span>
+                    <span className="text-emerald-600">₹15</span>
                   </label>
                 </RadioGroup>
               </div>
@@ -292,7 +272,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   </div>
                   <div>
                     <h2 className="text-gray-900">Payment Method</h2>
-                    <p className="text-sm text-gray-500">Secure payment processing</p>
+                    <p className="text-sm text-gray-500">Demo checkout — no real charge is made</p>
                   </div>
                 </div>
 
@@ -386,20 +366,24 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
 
                 {/* Cart Items */}
                 <div className="space-y-4 mb-6">
-                  {mockCartItems.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 truncate">{item.title}</p>
-                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                        <p className="text-sm text-emerald-600">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                  {cartItems.length === 0 ? (
+                    <p className="text-sm text-gray-400">Your cart is empty.</p>
+                  ) : (
+                    cartItems.map((item) => (
+                      <div key={item.id} className="flex gap-3">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-900 truncate">{item.title}</p>
+                          <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                          <p className="text-sm text-emerald-600">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 <Separator className="my-6" />
@@ -441,7 +425,7 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                     <div>
                       <p className="text-sm text-gray-900">Your Impact</p>
                       <p className="text-xs text-gray-600 mt-1">
-                        This purchase saves approximately 12kg of CO₂ and prevents 2 items from landfills!
+                        Buying secondhand instead of new helps reduce waste and emissions.
                       </p>
                     </div>
                   </div>
@@ -450,15 +434,16 @@ export function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 {/* Place Order Button */}
                 <Button
                   type="submit"
-                  className="w-full mt-6 h-12 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200"
+                  disabled={placingOrder || cartItems.length === 0}
+                  className="w-full mt-6 h-12 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-200 disabled:opacity-60"
                 >
                   <Lock className="h-4 w-4 mr-2" />
-                  Place Order
+                  {placingOrder ? "Placing Order..." : "Place Order"}
                 </Button>
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
                   <Lock className="h-3 w-3" />
-                  <span>Secure checkout powered by Stripe</span>
+                  <span>Demo checkout — no real payment is processed</span>
                 </div>
               </div>
             </div>

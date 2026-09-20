@@ -12,7 +12,7 @@ interface ProductDetailsProps {
   product: Product | null;
   open: boolean;
   onClose: () => void;
-  onAddToCart?: () => void;
+  onAddToCart?: (product: Product) => void;
 }
 
 const reviews = [
@@ -161,7 +161,7 @@ export function ProductDetails({ product, open, onClose, onAddToCart }: ProductD
             <div className="border-t border-gray-200 pt-6 space-y-3">
               <Button 
                 className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all h-12 rounded-xl"
-                onClick={onAddToCart}
+                onClick={() => product && onAddToCart?.(product)}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Add to Cart

@@ -5,60 +5,18 @@ import { Badge } from "./ui/badge";
 import { Trash2, Plus, Minus, ShoppingCart, ArrowRight, Tag } from "lucide-react";
 import { ImageWithFallback } from "./common/ImageWithFallback";
 import { Input } from "./ui/input";
-import { useState } from "react";
-
-interface CartItem {
-  id: string;
-  product: string;
-  image: string;
-  seller: string;
-  price: number;
-  quantity: number;
-  condition: string;
-}
+import { Product } from "./ProductCard";
 
 interface CartPageProps {
   onNavigate: (page: string) => void;
+  cartItems: (Product & { quantity: number })[];
+  onUpdateQuantity: (productId: string, change: number) => void;
+  onRemoveItem: (productId: string) => void;
 }
 
-export function CartPage({ onNavigate }: CartPageProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "1",
-      product: "Vintage Oak Dining Table",
-      image: "https://images.unsplash.com/photo-1668955254766-1bb2de25cf16?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWN5Y2xlZCUyMGZ1cm5pdHVyZXxlbnwxfHx8fDE3NjI4ODI4MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      seller: "Sarah Miller",
-      price: 245,
-      quantity: 1,
-      condition: "Good"
-    },
-    {
-      id: "2",
-      product: "Vintage Denim Jacket",
-      image: "https://images.unsplash.com/photo-1614990354198-b06764dcb13c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwY2xvdGhpbmd8ZW58MXx8fHwxNzYyODgyODA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      seller: "Mike Chen",
-      price: 45,
-      quantity: 1,
-      condition: "Like New"
-    },
-  ]);
-
-  const updateQuantity = (id: string, change: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
+export function CartPage({ onNavigate, cartItems, onUpdateQuantity, onRemoveItem }: CartPageProps) {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = 15;
+  const shipping = cartItems.length > 0 ? 15 : 0;
   const total = subtotal + shipping;
 
   return (
@@ -76,7 +34,10 @@ export function CartPage({ onNavigate }: CartPageProps) {
             </div>
             <h3 className="text-gray-900 mb-2">Your cart is empty</h3>
             <p className="text-gray-500 mb-6">Start shopping to add items to your cart</p>
-            <Button className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl">
+            <Button
+              onClick={() => onNavigate("home")}
+              className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl"
+            >
               Browse Products
             </Button>
           </CardContent>
@@ -91,38 +52,38 @@ export function CartPage({ onNavigate }: CartPageProps) {
                     <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                       <ImageWithFallback
                         src={item.image}
-                        alt={item.product}
+                        alt={item.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex justify-between mb-2">
                         <div>
-                          <h3 className="text-gray-900 mb-1">{item.product}</h3>
+                          <h3 className="text-gray-900 mb-1">{item.title}</h3>
                           <p className="text-sm text-gray-600">by {item.seller}</p>
                         </div>
                         <Button
                           variant="ghost"
                           size="icon"
                           className="rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => onRemoveItem(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      
+
                       <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 mb-3">
                         {item.condition}
                       </Badge>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <Button
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-lg"
-                            onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => onUpdateQuantity(item.id, -1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -133,7 +94,7 @@ export function CartPage({ onNavigate }: CartPageProps) {
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-lg"
-                            onClick={() => updateQuantity(item.id, 1)}
+                            onClick={() => onUpdateQuantity(item.id, 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -154,7 +115,7 @@ export function CartPage({ onNavigate }: CartPageProps) {
               <Card className="rounded-2xl border-gray-200">
                 <CardContent className="p-6 space-y-4">
                   <h3 className="text-gray-900">Order Summary</h3>
-                  
+
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal</span>
@@ -172,7 +133,7 @@ export function CartPage({ onNavigate }: CartPageProps) {
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     className="w-full h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl"
                     onClick={() => onNavigate("checkout")}
                   >
