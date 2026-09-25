@@ -183,7 +183,7 @@ export default function App() {
       case "login":
         return <LoginPage onNavigate={setCurrentPage} onLogin={handleLogin} />;
       case "sellerverification":
-        return <SellerVerificationPage />;
+        return <SellerVerificationPage onNavigate={setCurrentPage} />;
       default:
         return (
           <>

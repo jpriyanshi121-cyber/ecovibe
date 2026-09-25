@@ -6,6 +6,34 @@ const { sendPushToUser } = require("../utils/push");
 
 // GET /api/users/:id
 // GET /api/users/me — the logged-in user's own full profile
+// POST /api/users/me/seller-application — become a seller.
+// Note: only safe, non-financial fields are accepted here on purpose —
+// banking/payout details are never collected or stored by this app directly.
+exports.applyForSeller = async (req, res, next) => {
+  try {
+    const { businessType, businessName, sustainabilityStatement, recyclingPractices, certifications } = req.body;
+
+    if (!businessType) {
+      return res.status(400).json({ success: false, message: "Business type is required" });
+    }
+
+    req.user.role = "seller";
+    req.user.sellerApplication = {
+      businessType,
+      businessName: businessName || "",
+      sustainabilityStatement: sustainabilityStatement || "",
+      recyclingPractices: recyclingPractices || "",
+      certifications: Array.isArray(certifications) ? certifications : [],
+      submittedAt: new Date(),
+    };
+    await req.user.save();
+
+    res.json({ success: true, user: req.user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getMe = async (req, res, next) => {
   try {
     res.json({ success: true, user: req.user.toPublicJSON() });

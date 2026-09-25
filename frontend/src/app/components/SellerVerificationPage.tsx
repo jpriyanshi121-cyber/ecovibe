@@ -2,10 +2,16 @@ import React from "react";
 import { useState } from "react";
 import { Upload, CheckCircle2, AlertCircle, Shield, Building2, Leaf, CreditCard, FileText, User } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "../../lib/api";
 
 type VerificationStep = "personal" | "business" | "documents" | "banking" | "sustainability" | "review";
 
-export function SellerVerificationPage() {
+interface SellerVerificationPageProps {
+  onNavigate?: (page: string) => void;
+}
+
+export function SellerVerificationPage({ onNavigate }: SellerVerificationPageProps) {
+  const [submitting, setSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState<VerificationStep>("personal");
   const [formData, setFormData] = useState({
     // Personal Information
@@ -75,11 +81,33 @@ export function SellerVerificationPage() {
     }
   };
 
-  const handleSubmit = () => {
-    toast.success("Verification submitted successfully!", {
-      description: "We'll review your application and get back to you within 2-3 business days.",
-      duration: 5000,
-    });
+  const handleSubmit = async () => {
+    if (!formData.sustainabilityStatement.trim() || !formData.recyclingPractices.trim()) {
+      toast.error("Please complete the sustainability section before submitting");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await apiFetch("/users/me/seller-application", {
+        method: "POST",
+        body: JSON.stringify({
+          businessType: formData.businessType,
+          businessName: formData.businessName,
+          sustainabilityStatement: formData.sustainabilityStatement,
+          recyclingPractices: formData.recyclingPractices,
+          certifications: formData.sustainabilityCertifications,
+        }),
+      });
+      toast.success("You're now a verified seller!", {
+        description: "You can start listing items right away.",
+        duration: 5000,
+      });
+      onNavigate?.("dashboard");
+    } catch (err: any) {
+      toast.error(err?.message || "Couldn't submit your application");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const toggleCertification = (cert: string) => {
@@ -417,6 +445,13 @@ export function SellerVerificationPage() {
                   </ul>
                 </div>
               </div>
+
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <FileText className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-gray-500">
+                  Demo mode: document uploads shown here stay on your device and aren't sent anywhere — real ID verification will be added before launch.
+                </p>
+              </div>
             </div>
           )}
 
@@ -428,10 +463,10 @@ export function SellerVerificationPage() {
                 <p className="text-gray-600 text-sm">Add your bank account details to receive payments from sales.</p>
               </div>
               
-              <div className="flex items-start gap-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200 mb-6">
-                <Shield className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-emerald-900">
-                  <p>Your banking information is encrypted and secure. We never store your full account details on our servers.</p>
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 mb-6">
+                <Shield className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
+                  <p>Demo mode: this section is a preview of what payout setup will look like. Nothing you enter here is sent to our servers — real payouts will go through a secure payment partner (like Stripe or Razorpay) before launch, not stored directly by EcoVibe.</p>
                 </div>
               </div>
 
@@ -704,9 +739,10 @@ export function SellerVerificationPage() {
           {currentStep === "review" ? (
             <button
               onClick={handleSubmit}
-              className="px-8 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
+              disabled={submitting}
+              className="px-8 py-3 bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-60"
             >
-              Submit for Verification
+              {submitting ? "Submitting..." : "Submit for Verification"}
             </button>
           ) : (
             <button

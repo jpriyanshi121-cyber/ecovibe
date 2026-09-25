@@ -158,19 +158,22 @@ export function EcoReels({ onClose, onShopProduct }: EcoReelsProps) {
   const handleShare = useCallback(async (e: React.MouseEvent, reel: Reel) => {
     e.stopPropagation();
     const shareUrl = `${window.location.origin}/reels/${reel.id}`;
+
     if (navigator.share) {
       try {
         await navigator.share({ title: "EcoVibe Reel", text: reel.content, url: shareUrl });
-      } catch (err) {
-        // user cancelled the native share sheet; nothing to do
+        return;
+      } catch (err: any) {
+        if (err?.name === "AbortError") return; // user closed the native share sheet — not an error
+        // Any other failure (unsupported context, etc.) — fall through to clipboard below
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success("Link copied to clipboard");
-      } catch (err) {
-        toast.error("Couldn't copy link");
-      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard");
+    } catch (err) {
+      toast.error("Couldn't share or copy the link");
     }
   }, []);
 

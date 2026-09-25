@@ -26,6 +26,17 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     refreshToken: { type: String, select: false },
 
+    // Seller application (banking/payouts are intentionally NOT collected here —
+    // that happens later through a secure payment partner, never stored raw in our DB)
+    sellerApplication: {
+      businessType: { type: String, enum: ["individual", "small-business", "registered-company"] },
+      businessName: { type: String, trim: true },
+      sustainabilityStatement: { type: String, maxlength: 1000 },
+      recyclingPractices: { type: String, maxlength: 1000 },
+      certifications: [{ type: String }],
+      submittedAt: { type: Date },
+    },
+
     // Push
     pushSubscriptions: [
       {

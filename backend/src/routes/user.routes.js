@@ -9,6 +9,7 @@ router.get("/me", protect, ctrl.getMe);
 router.get("/me/saved", protect, ctrl.getSavedProducts);
 router.put("/me", protect, upload.single("avatar"), ctrl.updateProfile);
 router.post("/me/saved/:productId", protect, ctrl.toggleSavedProduct);
+router.post("/me/seller-application", protect, ctrl.applyForSeller);
 
 router.get("/:id", ctrl.getUser);
 router.post("/:id/follow", protect, ctrl.followUser);
